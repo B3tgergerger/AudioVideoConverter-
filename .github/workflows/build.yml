@@ -1,0 +1,38 @@
+name: Build EXE
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install pyinstaller
+
+    - name: Add FFmpeg to PATH
+      run: |
+        echo "${{ github.workspace }}" > $GITHUB_PATH
+        echo "${{ github.workspace }}\ffmpeg.exe" > $GITHUB_PATH
+
+    - name: Build executable
+      run: |
+        pyinstaller --onefile --noconsole converter.py
+
+    - name: Upload executable
+      uses: actions/upload-artifact@v2
+      with:
+        name: converter-exe
+        path: dist/converter.exe
