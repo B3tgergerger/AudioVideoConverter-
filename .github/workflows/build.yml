@@ -1,16 +1,13 @@
-name: Build EXE
+name: Build and Package
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Set up Python
@@ -20,19 +17,22 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pyinstaller
+        python -m pip install --upgrade pip
+        pip install ffmpeg-python PyInstaller
 
-    - name: Add FFmpeg to PATH
+    - name: Download FFmpeg
       run: |
-        echo "${{ github.workspace }}" > $GITHUB_PATH
-        echo "${{ github.workspace }}\ffmpeg.exe" > $GITHUB_PATH
+        wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz
+        tar -xvf ffmpeg-release-i686-static.tar.xz
+        cp ffmpeg-*/ffmpeg dist/
 
-    - name: Build executable
+    - name: Package using PyInstaller
       run: |
         pyinstaller --onefile --noconsole converter.py
+        cp ffmpeg-*/ffmpeg dist/
 
-    - name: Upload executable
+    - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: converter-exe
-        path: dist/converter.exe
+        name: converter
+        path: dist/
