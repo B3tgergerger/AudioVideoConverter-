@@ -20,16 +20,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install ffmpeg-python PyInstaller
 
-    - name: Download FFmpeg
-      run: |
-        wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz
-        tar -xvf ffmpeg-release-i686-static.tar.xz
-        cp ffmpeg-*/ffmpeg dist/
-
     - name: Package using PyInstaller
       run: |
         pyinstaller --onefile --noconsole converter.py
-        cp ffmpeg-*/ffmpeg dist/
+        cp ffmpeg.exe dist/
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
